@@ -1,13 +1,12 @@
 # Farmer-to-Consumer Discovery Platform Backend
 
-A free discovery platform for **consumers** and **farmers**. 
-
+A free discovery platform for **consumers** and **farmers**.
 
 ## About
-**Farmer-to-Consumer Discovery Platform** is a free discovery and connection platform where farmers can list their available products such as crops, vegetables, and fruits. Consumers can find nearby farmers based on location and product availability, and connect directly with sellers via phone calls or WhatsApp.
- 
-Our vision is to connect farmers directly with consumers to provide fresh, local produce without middlemen, thereby increasing farmers’ profits and ensuring fair prices.
 
+**Farmer-to-Consumer Discovery Platform** is a free discovery and connection platform where farmers can list their available products such as crops, vegetables, and fruits. Consumers can find nearby farmers based on location and product availability, and connect directly with sellers via phone calls or WhatsApp.
+
+Our vision is to connect farmers directly with consumers to provide fresh, local produce without middlemen, thereby increasing farmers’ profits and ensuring fair prices.
 
 ## Tech Stack
 
@@ -17,3 +16,55 @@ Our vision is to connect farmers directly with consumers to provide fresh, local
 [![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-6BA539?logo=openapiinitiative&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?logo=swagger&logoColor=black)
+
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/your_username/consumer-platform-backend.git
+```
+
+Go to the project directory
+
+```bash
+  cd consumer-platform-backend
+```
+
+Install dependencies
+
+```bash
+  npm install
+```
+
+### Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`DATABASE_URL`
+
+`JWT_SECRET`
+
+`PORT`
+
+### Prisma Setup
+
+Migrate all migrations to database
+
+```bash
+  npx prisma migrate dev
+```
+
+Generate Prisma client
+
+```bash
+  npx prisma generate
+```
+
+### Execution
+
+To start the development server, run:
+
+```bash
+  npm run dev
+```
