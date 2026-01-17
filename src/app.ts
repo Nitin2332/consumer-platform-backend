@@ -8,13 +8,11 @@ import farmerRoutes from "./modules/farmer/farmerRoutes.js";
 const app: Express = express();
 
 app.use(express.json());
-app.use(cors());
 app.use(cookieParser());
 
-const allowedOrigins =
-  env.ALLOWED_ORIGINS
-    ?.split(",")
-    .map(o => o.trim()) || [];
+const allowedOrigins = env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()) || [
+  "http://localhost:3000",
+];
 
 app.use(
   cors({
@@ -28,7 +26,7 @@ app.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 
 app.use("/api/auth", authRoutes);
