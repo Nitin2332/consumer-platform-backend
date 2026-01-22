@@ -13,7 +13,8 @@ const cookieOptions = {
 // User registration
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const user = await authService.register(req.body);
+    const validatedBody = (req as any).validatedData?.body;
+    const user = await authService.register(validatedBody);
     const token = generateToken(user.id, user.role);
 
     res.cookie("token", token, cookieOptions);
@@ -38,7 +39,8 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
-    const user = await authService.login(req.body);
+    const validatedBody = (req as any).validatedData?.body;
+    const user = await authService.login(validatedBody);
     const token = generateToken(user.id, user.role);
 
     res.cookie("token", token, cookieOptions);
