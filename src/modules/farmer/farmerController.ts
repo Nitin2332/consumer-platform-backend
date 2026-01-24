@@ -5,7 +5,8 @@ import type { Request, Response } from "express";
 export const createFarmerProfile = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user.id;
-    const profile = await farmerService.createProfile(userId, req.body);
+    const validatedBody = (req as any).validatedData?.body;
+    const profile = await farmerService.createProfile(userId, validatedBody);
     res
       .status(201)
       .json({ message: "Farmer profile created successfully", profile });
@@ -21,7 +22,8 @@ export const createFarmerProfile = async (req: Request, res: Response) => {
 
 export const adminverifyFarmer = async (req: Request, res: Response) => {
   try {
-    const { userId, status } = req.body;
+    const validatedBody = (req as any).validatedData?.body;
+    const { userId, status } = validatedBody;
     const farmerProfile = await farmerService.verifyFarmer(userId, status);
     res
       .status(200)
