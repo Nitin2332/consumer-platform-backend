@@ -2,6 +2,10 @@ import type { Request, Response } from "express";
 import { authService } from "./authService.js";
 import { userRepository } from "../user/userRepository.js";
 import { generateToken } from "../../shared/utils/jwtUtil.js";
+import {
+  throwError,
+  asyncHandler,
+} from "../../shared/middleware/errorHandler.js";
 
 const cookieOptions = {
   httpOnly: true,
@@ -11,8 +15,8 @@ const cookieOptions = {
 };
 
 // User registration
-export const registerUser = async (req: Request, res: Response) => {
-  try {
+export const registerUser = asyncHandler(
+  async (req: Request, res: Response) => {
     const validatedBody = (req as any).validatedData?.body;
     const user = await authService.register(validatedBody);
     const token = generateToken(user.id, user.role);
@@ -28,39 +32,25 @@ export const registerUser = async (req: Request, res: Response) => {
         role: user.role,
       },
     });
-  } catch (error: any) {
-    if (error.message === "USER_ALREADY_EXISTS") {
-      return res.status(409).json({ message: "User already exists" });
-    }
-    console.error("Registration error:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+  },
+);
 
-export const loginUser = async (req: Request, res: Response) => {
-  try {
-    const validatedBody = (req as any).validatedData?.body;
-    const user = await authService.login(validatedBody);
-    const token = generateToken(user.id, user.role);
+export const loginUser = asyncHandler(async (req: Request, res: Response) => {
+  const validatedBody = (req as any).validatedData?.body;
+  const user = await authService.login(validatedBody);
+  const token = generateToken(user.id, user.role);
 
-    res.cookie("token", token, cookieOptions);
-    res.status(200).json({
-      message: "Login successful",
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        role: user.role,
-      },
-    });
-  } catch (error: any) {
-    if (error.message === "INVALID_CREDENTIALS") {
-      return res.status(401).json({ message: "Invalid email or password" });
-    }
-    console.error("Login error:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+  res.cookie("token", token, cookieOptions);
+  res.status(200).json({
+    message: "Login successful",
+    user: {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role,
+    },
+  });
+});
 
 // User logout
 export const logoutUser = (req: Request, res: Response) => {
@@ -69,19 +59,15 @@ export const logoutUser = (req: Request, res: Response) => {
 };
 
 // Get user profile
-export const getUserProfile = async (req: Request, res: Response) => {
-  try {
+export const getUserProfile = asyncHandler(
+  async (req: Request, res: Response) => {
     const userId = (req as any).user?.id;
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+    if (!userId) throw throwError(401, "Unauthorized");
 
-    // Directly call repository for data retrieval
     const user = await userRepository.findProfileById(userId);
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) throw throwError(404, "User not found");
 
     res.status(200).json({ message: "Profile retrieved", user });
-  } catch (error) {
-    console.error("Get profile error:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+  },
+);

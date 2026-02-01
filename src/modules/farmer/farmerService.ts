@@ -1,10 +1,11 @@
 import { farmerRepository } from "./farmerRepository.js";
+import { throwError } from "../../shared/middleware/errorHandler.js";
 
 export const farmerService = {
   async createProfile(userId: string, data: any) {
     const existingProfile = await farmerRepository.findByUserId(userId);
     if (existingProfile) {
-      throw new Error("Farmer profile already exists for this user.");
+      throw throwError(409, "Farmer profile already exists for this user.");
     }
 
     return farmerRepository.create({ ...data, userId });
@@ -17,7 +18,7 @@ export const farmerService = {
 
     const existingProfile = await farmerRepository.findByUserId(userId);
     if (!existingProfile) {
-      throw new Error("Farmer profile not found.");
+      throw throwError(404, "Farmer profile not found.");
     }
 
     return farmerRepository.update(userId, safeData);
@@ -26,7 +27,7 @@ export const farmerService = {
   async verifyFarmer(userId: string, status: boolean) {
     const existingProfile = await farmerRepository.findByUserId(userId);
     if (!existingProfile) {
-      throw new Error("Farmer profile not found.");
+      throw throwError(404, "Farmer profile not found.");
     }
 
     return await farmerRepository.updateVerificationStatus(userId, status);

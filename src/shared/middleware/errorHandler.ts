@@ -5,6 +5,10 @@ interface CustomError extends Error {
   statusCode?: number;
 }
 
+const isCustomError = (err: unknown): err is CustomError => {
+  return !!err && typeof err === "object" && "statusCode" in (err as any);
+};
+
 export const throwError = (
   statusCode: number,
   message: string,
@@ -39,8 +43,8 @@ export const errorHandler = (
         message: issue.message,
       });
     });
-  } else if ((error as CustomError).statusCode) {
-    statusCode = (error as CustomError).statusCode || 500;
+  } else if (isCustomError(error) && error.statusCode) {
+    statusCode = error.statusCode || 500;
     message = error.message || "Internal server error";
   } else if (error.name === "JsonWebTokenError") {
     statusCode = 401;
