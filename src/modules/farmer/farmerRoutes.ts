@@ -10,7 +10,7 @@ const router = Router();
 router.post(
   "/profile",
   authMiddleware,
-  roleMiddleware(["farmer"]),
+  roleMiddleware(["FARMER"]),
   createFarmerProfile
 );
 

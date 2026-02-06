@@ -5,6 +5,7 @@ import cors from "cors";
 import { env } from "./config/env.js";
 import farmerRoutes from "./modules/farmer/farmerRoutes.js";
 import productRoutes from "./modules/product/productRoutes.js";
+import searchRoutes from "./modules/search/searchRoutes.js";
 
 const app: Express = express();
 
@@ -36,5 +37,7 @@ app.get("/", (req, res) => {
 app.use("/api/farmer", farmerRoutes);
 
 app.use("/api/product", productRoutes);
+
+app.use("/api/search", searchRoutes);
 
 export default app;
