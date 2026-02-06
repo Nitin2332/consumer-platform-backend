@@ -4,6 +4,14 @@ import {
   roleMiddleware,
 } from "../../shared/middleware/authMiddleware.js";
 import { adminverifyFarmer, createFarmerProfile } from "./farmerController.js";
+import {
+  validateRequest,
+  sanitizeRequestBody,
+} from "../../shared/middleware/validationMiddleware.js";
+import {
+  createFarmerProfileSchema,
+  verifyFarmerSchema,
+} from "../../shared/validation/schemas.js";
 
 const router = Router();
 
@@ -12,13 +20,18 @@ router.post(
   authMiddleware,
   roleMiddleware(["FARMER"]),
   createFarmerProfile
+  sanitizeRequestBody,
+  validateRequest(createFarmerProfileSchema),
+  createFarmerProfile,
 );
 
 router.patch(
   "/verify",
   authMiddleware,
-  roleMiddleware(["admin"]),
-  adminverifyFarmer
+  roleMiddleware(["ADMIN"]),
+  sanitizeRequestBody,
+  validateRequest(verifyFarmerSchema),
+  adminverifyFarmer,
 );
 
 export default router;

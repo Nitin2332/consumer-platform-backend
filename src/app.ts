@@ -6,6 +6,7 @@ import { env } from "./config/env.js";
 import farmerRoutes from "./modules/farmer/farmerRoutes.js";
 import productRoutes from "./modules/product/productRoutes.js";
 import searchRoutes from "./modules/search/searchRoutes.js";
+import { sanitizeRequestBody } from "./shared/middleware/validationMiddleware.js";
 
 const app: Express = express();
 
@@ -27,6 +28,8 @@ app.use(
 );
 
 app.use(cookieParser());
+
+app.use(sanitizeRequestBody);
 
 app.use("/api/auth", authRoutes);
 
