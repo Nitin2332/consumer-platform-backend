@@ -1,5 +1,6 @@
 import { userRepository } from "../user/userRepository.js";
 import { hashPassword, comparePassword } from "../../shared/utils/jwtUtil.js";
+import { throwError } from "../../shared/middleware/errorHandler.js";
 
 export const authService = {
   async register(userData: any) {
@@ -8,7 +9,7 @@ export const authService = {
     // 1. Check if user already exists
     const existingUser = await userRepository.findByEmail(email);
     if (existingUser) {
-      throw new Error("User already exists");
+      throw throwError(409, "User already exists");
     }
 
     // 2. Hash the password
@@ -29,13 +30,13 @@ export const authService = {
     // 1. Find user
     const user = await userRepository.findByEmail(email);
     if (!user) {
-      throw new Error("Invalid Credentials");
+      throw throwError(401, "Invalid credentials");
     }
 
     // 2. Verify password
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
-      throw new Error("Invalid Credentials");
+      throw throwError(401, "Invalid credentials");
     }
 
     return user;

@@ -6,6 +6,10 @@ import { env } from "./config/env.js";
 import farmerRoutes from "./modules/farmer/farmerRoutes.js";
 import productRoutes from "./modules/product/productRoutes.js";
 import { sanitizeRequestBody } from "./shared/middleware/validationMiddleware.js";
+import {
+  errorHandler,
+  notFoundHandler,
+} from "./shared/middleware/errorHandler.js";
 
 const app: Express = express();
 
@@ -39,5 +43,8 @@ app.get("/", (req, res) => {
 app.use("/api/farmer", farmerRoutes);
 
 app.use("/api/product", productRoutes);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 export default app;
