@@ -1,5 +1,6 @@
 import { farmerRepository } from "./farmerRepository.js";
 const { geocodeAddress } = await import("../../shared/utils/geoCodingUtil.js");
+import { throwError } from "../../shared/middleware/errorHandler.js";
 
 export const farmerService = {
   async createProfile(userId: string, data: any) {
@@ -9,7 +10,7 @@ export const farmerService = {
     data.latitude = lat;
     data.longitude = lng;
     if (existingProfile) {
-      throw new Error("Farmer profile already exists for this user.");
+      throw throwError(409, "Farmer profile already exists for this user.");
     }
 
     return farmerRepository.create({ ...data, userId, latitude: lat, longitude: lng });
@@ -22,7 +23,7 @@ export const farmerService = {
 
     const existingProfile = await farmerRepository.findByUserId(userId);
     if (!existingProfile) {
-      throw new Error("Farmer profile not found.");
+      throw throwError(404, "Farmer profile not found.");
     }
 
     return farmerRepository.update(userId, safeData);
@@ -31,7 +32,7 @@ export const farmerService = {
   async verifyFarmer(userId: string, status: boolean) {
     const existingProfile = await farmerRepository.findByUserId(userId);
     if (!existingProfile) {
-      throw new Error("Farmer profile not found.");
+      throw throwError(404, "Farmer profile not found.");
     }
 
     return await farmerRepository.updateVerificationStatus(userId, status);
