@@ -19,7 +19,6 @@ router.post(
   "/profile",
   authMiddleware,
   roleMiddleware(["FARMER"]),
-  createFarmerProfile
   sanitizeRequestBody,
   validateRequest(createFarmerProfileSchema),
   createFarmerProfile,
