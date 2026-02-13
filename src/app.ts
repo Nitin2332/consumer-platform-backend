@@ -5,6 +5,7 @@ import cors from "cors";
 import { env } from "./config/env.js";
 import farmerRoutes from "./modules/farmer/farmerRoutes.js";
 import productRoutes from "./modules/product/productRoutes.js";
+import searchRoutes from "./modules/search/searchRoutes.js";
 import { sanitizeRequestBody } from "./shared/middleware/validationMiddleware.js";
 import {
   errorHandler,
@@ -44,6 +45,7 @@ app.use("/api/farmer", farmerRoutes);
 
 app.use("/api/product", productRoutes);
 
+app.use("/api/search", searchRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

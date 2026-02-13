@@ -58,6 +58,8 @@ model FarmerProfile {
   address  String
   city     String
   district String
+  latitude  Float @default(0.0)
+  longitude Float @default(0.0)
 
   // Admin fields
   isVerified Boolean @default(false)
