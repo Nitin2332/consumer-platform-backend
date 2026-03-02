@@ -31,4 +31,33 @@ export const userRepository = {
       },
     });
   },
+
+  findByIdWithPassword(id: string) {
+    return prisma.user.findUnique({ where: { id } });
+  },
+
+  updateProfileById(
+    id: string,
+    data: { fullName?: string; email?: string; password?: string },
+  ) {
+    return prisma.user.update({
+      where: { id },
+      data,
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        role: true,
+        createdAt: true,
+        farmerProfile: {
+          select: {
+            id: true,
+            farmName: true,
+            address: true,
+            city: true,
+          },
+        },
+      },
+    });
+  },
 };

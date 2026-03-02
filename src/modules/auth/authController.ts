@@ -1,7 +1,11 @@
 import type { Request, Response } from "express";
 import { authService } from "./authService.js";
 import { userRepository } from "../user/userRepository.js";
-import { generateToken } from "../../shared/utils/jwtUtil.js";
+import {
+  generateToken,
+  hashPassword,
+  comparePassword,
+} from "../../shared/utils/jwtUtil.js";
 import {
   throwError,
   asyncHandler,
@@ -69,5 +73,43 @@ export const getUserProfile = asyncHandler(
     if (!user) throw throwError(404, "User not found");
 
     res.status(200).json({ message: "Profile retrieved", user });
+  },
+);
+
+// Update user profile
+export const updateUserProfile = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = (req as any).user?.id;
+    if (!userId) throw throwError(401, "Unauthorized");
+
+    const { fullName, email, currentPassword, newPassword } =
+      (req as any).validatedData?.body ?? req.body;
+
+    const updates: { fullName?: string; email?: string; password?: string } =
+      {};
+
+    if (fullName) updates.fullName = fullName;
+    if (email) updates.email = email;
+
+    if (newPassword) {
+      const existing = await userRepository.findByIdWithPassword(userId);
+      if (!existing) throw throwError(404, "User not found");
+
+      const valid = await comparePassword(
+        currentPassword ?? "",
+        existing.password,
+      );
+      if (!valid) throw throwError(400, "Current password is incorrect");
+
+      updates.password = await hashPassword(newPassword);
+    }
+
+    if (Object.keys(updates).length === 0) {
+      throw throwError(400, "No fields to update");
+    }
+
+    const updated = await userRepository.updateProfileById(userId, updates);
+
+    res.status(200).json({ message: "Profile updated", user: updated });
   },
 );

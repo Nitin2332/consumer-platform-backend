@@ -168,6 +168,34 @@ export const createFarmerProfileSchema = z.object({
   }),
 });
 
+// Update profile schema
+export const updateProfileSchema = z.object({
+  body: z.object({
+    fullName: z
+      .string()
+      .min(2, "Full name must be at least 2 characters")
+      .max(100, "Full name must not exceed 100 characters")
+      .regex(
+        /^[a-zA-Z\s'-]+$/,
+        "Full name can only contain letters, spaces, hyphens, and apostrophes",
+      )
+      .optional(),
+    email: z.string().email("Invalid email address").optional(),
+    currentPassword: z.string().min(1).optional(),
+    newPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one digit")
+      .regex(
+        /[!@#$%^&*]/,
+        "Password must contain at least one special character (!@#$%^&*)",
+      )
+      .optional(),
+  }),
+});
+
 export const verifyFarmerSchema = z.object({
   body: z.object({
     userId: z.cuid("Invalid user ID format"),
@@ -180,6 +208,7 @@ export const verifyFarmerSchema = z.object({
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type AddProductInput = z.infer<typeof addProductSchema>;
 export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 export type DeleteProductInput = z.infer<typeof deleteProductSchema>;
