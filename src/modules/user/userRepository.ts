@@ -33,7 +33,10 @@ export const userRepository = {
   },
 
   findByIdWithPassword(id: string) {
-    return prisma.user.findUnique({ where: { id } });
+    return prisma.user.findUnique({
+      where: { id },
+      select: { id: true, password: true },
+    });
   },
 
   updateProfileById(
