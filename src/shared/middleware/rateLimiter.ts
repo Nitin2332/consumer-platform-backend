@@ -2,9 +2,20 @@ import rateLimit from "express-rate-limit";
 
 export const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,                  
+  max: 5,
   message: {
     message: "Too many authentication attempts. Please try again later.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  ipv6Subnet: 56,
+});
+
+export const profileUpdateRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: {
+    message: "Too many profile update attempts. Please try again later.",
   },
   standardHeaders: true,
   legacyHeaders: false,

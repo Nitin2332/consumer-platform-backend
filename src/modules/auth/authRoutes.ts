@@ -4,9 +4,10 @@ import {
   loginUser,
   logoutUser,
   getUserProfile,
+  updateUserProfile,
 } from "./authController.js";
 import { authMiddleware } from "../../shared/middleware/authMiddleware.js";
-import { authRateLimiter } from "../../shared/middleware/rateLimiter.js";
+import { authRateLimiter, profileUpdateRateLimiter } from "../../shared/middleware/rateLimiter.js";
 import {
   validateRequest,
   sanitizeRequestBody,
@@ -14,6 +15,7 @@ import {
 import {
   registerSchema,
   loginSchema,
+  updateProfileSchema,
 } from "../../shared/validation/schemas.js";
 
 const router = Router();
@@ -36,5 +38,14 @@ router.post(
 router.post("/logout", logoutUser);
 
 router.get("/profile", authMiddleware, getUserProfile);
+
+router.patch(
+  "/profile",
+  authMiddleware,
+  profileUpdateRateLimiter,
+  sanitizeRequestBody,
+  validateRequest(updateProfileSchema),
+  updateUserProfile,
+);
 
 export default router;

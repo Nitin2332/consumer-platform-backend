@@ -1,7 +1,11 @@
 import type { Request, Response } from "express";
 import { authService } from "./authService.js";
 import { userRepository } from "../user/userRepository.js";
-import { generateToken } from "../../shared/utils/jwtUtil.js";
+import {
+  generateToken,
+  hashPassword,
+  comparePassword,
+} from "../../shared/utils/jwtUtil.js";
 import {
   throwError,
   asyncHandler,
@@ -69,5 +73,64 @@ export const getUserProfile = asyncHandler(
     if (!user) throw throwError(404, "User not found");
 
     res.status(200).json({ message: "Profile retrieved", user });
+  },
+);
+
+// Update user profile
+export const updateUserProfile = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = (req as any).user?.id;
+    if (!userId) throw throwError(401, "Unauthorized");
+
+    const validatedBody = (req as any).validatedData?.body;
+    if (!validatedBody)
+      throw throwError(400, "Missing or invalid request body");
+
+    const { fullName, email, currentPassword, newPassword } = validatedBody;
+
+    const updates: { fullName?: string; email?: string; password?: string } =
+      {};
+
+    if (fullName) updates.fullName = fullName;
+
+    if (email) {
+      const existing = await userRepository.findByEmail(email);
+      if (existing && existing.id !== userId) {
+        throw throwError(409, "Email is already in use by another account");
+      }
+      updates.email = email;
+    }
+
+    if (newPassword) {
+      if (!currentPassword) {
+        throw throwError(
+          400,
+          "Current password is required to set a new password",
+        );
+      }
+
+      const record = await userRepository.findByIdWithPassword(userId);
+      if (!record) throw throwError(404, "User not found");
+
+      const valid = await comparePassword(currentPassword, record.password);
+      if (!valid) throw throwError(400, "Current password is incorrect");
+
+      updates.password = await hashPassword(newPassword);
+    }
+
+    if (Object.keys(updates).length === 0) {
+      throw throwError(400, "No fields to update");
+    }
+
+    try {
+      const updated = await userRepository.updateProfileById(userId, updates);
+      res.status(200).json({ message: "Profile updated", user: updated });
+    } catch (err: any) {
+      // Prisma unique-constraint violation (e.g. email race condition)
+      if (err?.code === "P2002") {
+        throw throwError(409, "Email is already in use by another account");
+      }
+      throw err;
+    }
   },
 );
